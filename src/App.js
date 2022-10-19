@@ -1,21 +1,23 @@
-import app from './firebase/firebase.init';
+import './App.css';
 import {
   getAuth,
+  GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
-import './App.css';
+import app from './firebase/firebase.init';
 import { useState } from 'react';
 
 const auth = getAuth(app);
 
 function App() {
   const [user, setUser] = useState({});
-  const provider = new GoogleAuthProvider();
+  const googleProvider = new GoogleAuthProvider();
+  const githubProvider = new GithubAuthProvider();
 
   const handleGoogleSignIn = () => {
-    signInWithPopup(auth, provider)
+    signInWithPopup(auth, googleProvider)
       .then(result => {
         const user = result.user;
         setUser(user);
@@ -36,17 +38,31 @@ function App() {
       });
   };
 
+  const handleGithubSignIn = () => {
+    signInWithPopup(auth, githubProvider)
+      .then(result => {
+        const user = result.user;
+        setUser(user);
+        console.log(user);
+      })
+      .catch(error => {
+        console.error('error: ', error);
+      });
+  };
   return (
     <div className='App'>
       {/* condition ? true: false */}
 
-      {user.email ? (
-        <button onClick={handleGoogleSignIn}>Google sign in</button>
-      ) : (
+      {user.uid ? (
         <button onClick={handleSignOut}>Sign Out</button>
+      ) : (
+        <>
+          <button onClick={handleGoogleSignIn}>Google sign in</button>
+          <button onClick={handleGithubSignIn}>Github Sign In</button>
+        </>
       )}
 
-      {user.email && (
+      {user.uid && (
         <div>
           <h3>User name: {user.displayName}</h3>
           <p>Email address: {user.email}</p>
